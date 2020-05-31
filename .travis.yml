@@ -1,5 +1,6 @@
 language: generic
 os: linux
+sudo: required
 
 install:
   - cd ci/
@@ -25,6 +26,7 @@ before_script:
   - git fetch --unshallow --tags
   - bash scripts/pgfplots/pgfplotsrevisionfile.sh
   - cat tex/generic/pgfplots/pgfplots.revision.tex
+  - sudo sed -i 's/rights="none"/rights="read|write"/g' /etc/ImageMagick*/policy.xml
 
 _build_manual: &_build_manual |
   set -e
@@ -76,7 +78,13 @@ jobs:
 
     - name: regressiontests
       env: suite=regressiontests
-      addons: {apt: {packages: [*base_deps, imagemagick]}}
+      addons:
+        apt:
+          packages:
+            - *base_deps
+            - apcalc
+            - imagemagick
+            - poppler-utils
       script: *_build_tests
 
     - name: unittest
